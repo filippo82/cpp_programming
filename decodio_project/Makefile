@@ -4,12 +4,12 @@ LDFLAGS =
 
 default: all
 
-all: simple1
+all: create_data
 
-simple1: simple1.o
+create_data: create_data.o
 		$(CC) -o $@ $^ $(LDFLAGS)
 
-simple1.o: simple1.cpp
+create_data.o: create_data.cpp
 		$(CC) -c $(CFLAGS) $<
 
 .PHONY: clean cleanest
@@ -18,4 +18,4 @@ clean:
 		rm *.o
 
 cleanest: clean
-		rm simple1
+		rm create_data
