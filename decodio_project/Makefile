@@ -4,13 +4,19 @@ LDFLAGS =
 
 default: all
 
-all: create_data
+all: wave
 
-create_data: create_data.o
-		$(CC) -o $@ $^ $(LDFLAGS)
-
-create_data.o: create_data.cpp
+wavetools.o: wavetools.cpp
 		$(CC) -c $(CFLAGS) $<
+
+utils.o: utils.cpp
+		$(CC) -c $(CFLAGS) $<
+
+wave.o: wave.cpp
+		$(CC) -c $(CFLAGS) $<
+
+wave: wave.o wavetools.o utils.o
+		$(CC) $(LDFLAGS) -o $@ $^
 
 .PHONY: clean cleanest
 
