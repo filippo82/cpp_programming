@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void print(const WaveForm<float> & waveform);
-void print(const WaveForm<double> & waveform);
+void print(const WaveForm<float> & waveform, int maxt);
+void print(const WaveForm<double> & waveform, int maxt);
 
 #endif

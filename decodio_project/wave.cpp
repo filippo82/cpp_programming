@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Usage: " << argv[0] << " number_of_sinusoids" << std::endl;
 		n_freq = 0; // if conversion fails, set myint to a default value
+        return 1;
     }
 
     // Print the number of frequencies:
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
     std::stringstream fn {"wave.bin"};
 
     result = read_raw_waveform(1000, waveform);
-    print(waveform);
+    print(waveform, 20);
 
     return 0;
 }
