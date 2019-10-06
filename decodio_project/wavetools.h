@@ -5,6 +5,13 @@
 
 using namespace std;
 
+struct Config
+{
+    int nt;
+    int nf;
+    vector<int> freqs;
+};
+
 template<typename T>
 class WaveForm
 {

@@ -9,5 +9,6 @@ using namespace std;
 
 void print(const WaveForm<float> & waveform, int maxt);
 void print(const WaveForm<double> & waveform, int maxt);
+Config read_config(string fn);
 
 #endif

@@ -28,29 +28,31 @@ int main(int argc, char* argv[])
     // set up a stringstream variable named convert, initialized with the input from argv[1]
     std::stringstream convert {argv[1]};
     // do the conversion
-	if (!(convert >> n_freq))
-    {
-        std::cerr << "Usage: " << argv[0] << " number_of_sinusoids" << std::endl;
-		n_freq = 0; // if conversion fails, set myint to a default value
-        return 1;
-    }
+	// if (!(convert >> n_freq))
+    // {
+    //     std::cerr << "Usage: " << argv[0] << " number_of_sinusoids" << std::endl;
+	// 	n_freq = 0; // if conversion fails, set n_freq to a default value
+    //     return 1;
+    // }
+
+    Config config{read_config(argv[1])};
 
     // Print the number of frequencies:
-    std::cout << "The created waveform will consists of " << n_freq << " frequencies!" << std::endl;
+    std::cout << "The created waveform will consists of " << config.nf << " frequencies!" << std::endl;    
 
     // Create the raw waveform vector
     vector<double> raw_waveform;
 
     // Create the waveform vector
-    WaveForm<float> waveform(0, n_freq);
+    WaveForm<float> waveform(0, config.nf);
 
     int result {0};
-    result = create_raw_waveform(n_freq, raw_waveform);
+    result = create_raw_waveform(config.nf, raw_waveform);
     result = save_raw_waveform(raw_waveform);
 
     std::stringstream fn {"wave.bin"};
 
-    result = read_raw_waveform(1000, waveform);
+    result = read_raw_waveform(config.nt, waveform);
     print(waveform, 20);
 
     return 0;
