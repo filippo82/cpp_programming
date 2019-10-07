@@ -1,0 +1,9 @@
+# Configuration file
+# nt
+1000
+# n_freq
+2
+# Selected frequencies
+5 10 20
+# Output file
+wave_from_config.bin
