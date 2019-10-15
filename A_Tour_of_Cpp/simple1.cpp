@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 void copy_fct()
 {
@@ -23,10 +24,25 @@ void print()
         std::cout << x << '\n';
 }
 
+void cpp11_loop1()
+{
+    std::vector<int> vec {100, 200, 300, 400};
+    std::vector<int>::iterator it;
+    for (auto v: vec)
+        v *= 2;
+    for (auto i = 0; i < vec.size(); i++)
+        std::cout << vec[i] << std::endl;
+    for (it = vec.begin(); it != vec.end(); ++it)
+        *it *= 2;
+    for (auto i = 0; i < vec.size(); i++)
+        std::cout << vec[i] << std::endl;
+}
+
 int main()
 {
     copy_fct();
     print();
+    cpp11_loop1();
 
     return 0;
 }
