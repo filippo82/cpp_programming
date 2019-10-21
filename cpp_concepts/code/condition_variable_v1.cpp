@@ -18,7 +18,7 @@ class Application
     }
     void loadData()
     {
-      // Make This Thread sleep for 1 Second
+      // Make This Thread sleep for 5 Second
       std::this_thread::sleep_for(std::chrono::milliseconds(5000));
       std::cout<<"Loading Data from XML"<<std::endl;
       // Lock The Data structure
