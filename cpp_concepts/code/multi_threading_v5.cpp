@@ -36,7 +36,7 @@ int main()
     std::vector<int> v;
     v.resize(1000000, 2);
 
-    size_t nthreads = 4;
+    size_t nthreads = 20;
 
     size_t stride = v.size() / nthreads;
     std::cout << "stride is: " << stride << std::endl;
