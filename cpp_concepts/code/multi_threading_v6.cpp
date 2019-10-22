@@ -3,23 +3,8 @@
 #include <thread>
 #include <algorithm>
 #include <atomic>
-
-class WorkerThread
-{
-    public:
-        // WorkerThread(int val): _acm(val) {}
-        void operator()(const std::vector<int> &v, unsigned int beginIndex, unsigned int endIndex)
-        {
-            // std::cout << "Worker Thread " << std::this_thread::get_id() << " is Executing" << std::endl;
-            _acm = 4;
-            for (unsigned int i = beginIndex; i < endIndex; ++i)
-            {
-              _acm += v[i];
-            }
-            std::cout << "Worker Thread " << std::this_thread::get_id() << " is Executing. Sum: " << _acm << std::endl;
-        }
-        unsigned long long _acm;
-};
+#include <random>
+#include <numeric>
 
 void workerThreadFunction(const std::vector<int> &v, std::atomic<unsigned long long> &acm, unsigned int beginIndex, unsigned int endIndex)
 {
@@ -28,14 +13,28 @@ void workerThreadFunction(const std::vector<int> &v, std::atomic<unsigned long l
         {
           _acm += v[i];
         }
-        // std::cout << "Worker Thread " << std::this_thread::get_id() << " is Executing. Sum: " << acm << std::endl;
         acm += _acm;
 };
 
 int main()
 {
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis(0, 99);
     std::vector<int> v;
-    v.resize(100000000, 3);
+    v.resize(100000);
+    // for (auto& item: v)
+    // {
+    //     item = dis(gen);
+    // }
+    auto gen2 = [&dis, &gen](){return dis(gen);};
+
+    generate(begin(v), end(v), gen2);
+    std::cout << v[10] << std::endl;
+    std::cout << v[100] << std::endl;
+    std::cout << v[1000] << std::endl;
+    std::cout << v[10000] << std::endl;
+    // std::cout << v[100000] << std::endl;
 
     std::atomic<unsigned long long> result(0);
 
@@ -44,19 +43,10 @@ int main()
     size_t stride = v.size() / nthreads;
     std::cout << "stride is: " << stride << std::endl;
 
-    // std::vector<WorkerThread> workerList;
     std::vector<std::thread> threadList;
-    std::vector<unsigned long long> acmList;
     for(unsigned int i = 0; i < nthreads; ++i)
     {
-        // WorkerThread worker;
-        // workerList.push_back(worker);
-        // workerList.emplace_back();
-        // acmList.emplace_back();
-        // std::cout << i << " xxxxxxxxxx acm: " << acmList[i] << std::endl;
         std::cout << i << " begin: " << i * stride << " end: " << (i + 1) * stride << std::endl;
-        // threadList.push_back(std::thread(std::ref(workerList[i]), std::ref(v), i * stride, (i + 1) * stride));
-        // threadList.emplace_back(workerThreadFunction, std::ref(v), std::ref(acmList[i]), i * stride, (i + 1) * stride);
         threadList.emplace_back(workerThreadFunction, std::ref(v), std::ref(result), i * stride, (i + 1) * stride);
     }
     // Now wait for all the worker thread to finish i.e.
@@ -69,13 +59,8 @@ int main()
             entry.join();
     }
     std::cout << "Exiting from Main Thread" << std::endl;
-    std::cout << "The result is " << result << std::endl;
-    // std::cout << "acmList.size() is " << acmList.size() << std::endl;
-    // for (auto& acm: acmList)
-    // {
-    //     std::cout << "CIAONE: " << acm << std::endl;
-    // }
-    // std::for_each(threadList.begin(),threadList.end(), std::mem_fn(&std::thread::join));
+    std::cout << "The result is " << result / v.size() << std::endl;
+    std::cout << "The result is " << std::accumulate(begin(v), end(v), 0) / v.size() << std::endl;
 
     return 0;
 }
