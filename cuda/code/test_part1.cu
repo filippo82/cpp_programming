@@ -1,28 +1,35 @@
 #include <iostream>
 #include <math.h>
-#include <time.h> 
+#include <time.h>
 #include <stdio.h>
 
 // CPU version - Serial - One thread
 void add_cpu(int n, float *x, float *y)
 {
    for (int i=0; i<n; i++)
-   {  
-      y[i] = x[i] + y[i];
+   {
+      y[i] = cos(x[i]) + sin(y[i]);
    }
 }
 
 // Kernel function to add the elements of two arrays
 __global__
-void add_gpu(int n, float *x, float *y)
+void add_gpu(int n, float *x, float *y, int a)
 {
   // int index = threadIdx.x;
   // int stride = blockDim.x;
-  int index = blockIdx.x * blockDim.x + threadIdx.x;
-  int stride = blockDim.x * gridDim.x;
-  for (int i = index; i < n; i += stride)
+  // int check = 0;
+  // int index = blockIdx.x * blockDim.x + threadIdx.x;
+  // int stride = blockDim.x * gridDim.x;
+  // if (check == 0) {
+  //     printf("Stride for blockDim = %d is %d\n", a, stride);
+  //     check = 1;
+  // }
+  for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < n; i += blockDim.x * gridDim.x)
   {
-    y[i] = x[i] + y[i];
+    // y[i] = x[i] + y[i];
+    y[i] = a;
+    // y[i] = cos(x[i]) + sin(y[i]);
   }
 }
 
@@ -41,6 +48,8 @@ void checkCudaDevices()
       printf("  Major: %d\n", prop.major);
       printf("  Minor: %d\n", prop.minor);
       printf("  Multiprocess count: %d\n", prop.multiProcessorCount);
+      printf("  Max dimension size of a grid size (x,y,z): (%d, %d, %d)", prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
+      // printf("  Max grid size: %d\n", prop.maxGridSize[0]);
       printf("\n");
   }
 }
@@ -53,7 +62,7 @@ int main(void)
   cudaDeviceGetAttribute(&numSMs, cudaDevAttrMultiProcessorCount, devId);
   // std::cout << "NumSMs: " << numSMs << std::endl;
 
-  int n = 1 << 30; // Around 4GB
+  int n = 1 << 20; // Around 4GB
   float *x, *y;
 
   // Allocate Unified Memory – accessible from CPU or GPU
@@ -61,7 +70,7 @@ int main(void)
   cudaMallocManaged(&y, n*sizeof(float));
 
   // Initialize x and y arrays on the host
-  for (int i = 0; i < n; i++) 
+  for (int i = 0; i < n; i++)
   {
     x[i] = 1.0f;
     y[i] = 2.0f;
@@ -96,11 +105,11 @@ int main(void)
     for(int j=0; j<1; j++)
     {
       t = clock(); // Start time
-      int blockSize = i; // Threads per block
+      int blockSize = 1024 - i + 32; // Threads per block
       int numBlocks = (n + blockSize - 1) / blockSize;
       // add_gpu<<<dim3(i, 1, 1), dim3(16, 1, 1)>>>(n, x, y);
-      // add_gpu<<<numBlocks, blockSize>>>(n, x, y);
-      add_gpu<<<256*numSMs, blockSize>>>(n, x, y);
+      add_gpu<<<numBlocks, blockSize>>>(n, x, y, blockSize);
+      // add_gpu<<<256*numSMs, blockSize>>>(n, x, y);
       cudaDeviceSynchronize();
       t = clock() - t; // Total time = end time - start time
       printf("<<<%d, %d>>> - GPU RUN-%d time = %f ms.\n",numBlocks, blockSize, j,(((float)t)/CLOCKS_PER_SEC)*1000);
@@ -108,15 +117,13 @@ int main(void)
     }
     data[i] = avg / 10.0;
     // std::cout << "The average time on GPU is: " << data[i] << " ms" << std::endl;
-    std::cout << y[1] << std::endl;
+    std::cout << y[100] << std::endl;
   }
 
   // std::cout << y[1] << std::endl;
-  
+
   // Free memory
   cudaFree(x);
-  cudaFree(y); 
+  cudaFree(y);
   return 0;
 }
-
-
